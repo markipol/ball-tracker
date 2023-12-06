@@ -1,9 +1,12 @@
-import sys
 import cv2 as cv
 import numpy as np
 
-# these are pixels on the screen btw
-# will only detect acircles that have a radius in this range
+# run pip install opencv-python in a cmd window before running to install opencv
+# you can also find examples online with static images if you don't have a webcam
+
+# will only detect circles in this range (in terms of pixels on the screen)
+# also, it is not perfect, but works well on a flat background with strong contrast, which is our use case
+
 MIN_RADIUS = 1
 MAX_RADIUS = 100
 
@@ -23,6 +26,8 @@ def main():
             break
 
         # Convert to grayscale
+        # Should be using contrasting colors for ball and plane
+        # i.e. black and white, blue and orange
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
         # Apply median blur
@@ -42,14 +47,18 @@ def main():
                 # Draw the outer circle
                 cv.circle(frame, center, radius, (0, 255, 0), 2)
                 # Draw the center of the circle
+                # (these coorinates would be sent to the balancing code)
                 cv.circle(frame, center, 2, (0, 0, 255), 3)
 
         # Display the frame with detected circles
         cv.imshow("Detected Circles", frame)
 
-        # Break the loop if 'q' is pressed or the window is closed
+        # Break the loop if 'q' is pressed 
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
+        # Need this code otherwise window never closes even if you press X
+        if cv.getWindowProperty("Detected Circles",cv.WND_PROP_VISIBLE) < 1:        
+            break   
 
     # Release the video capture and close all OpenCV windows
     cap.release()
